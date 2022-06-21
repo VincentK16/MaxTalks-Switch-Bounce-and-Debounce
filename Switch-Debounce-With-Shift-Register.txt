@@ -1,0 +1,97 @@
+/*
+ * Board:   Arduion Uno
+ * Target:  Demonstration of Switch Debounce
+ * Author:  Clive "Max" Maxfield (max@clivemaxfield.com) 
+ * License: The MIT License (See full license at the bottom of this file)
+ *
+ *          V01 First incarnation using shift register 
+ */
+
+#define CLK_TICK   1 
+#define MAX_COUNT 20
+
+#define SW_ON      0 // For active-low switch
+#define SW_OFF     1 //
+
+#define ALL_ZEROS  0x00000000U
+#define ALL_ONES   0x000FFFFFU
+#define SR_MASK       ALL_ONES
+
+uint32_t ShiftReg;
+uint32_t LookFor;
+uint32_t TimeThen = millis();
+
+const int PinSw = 6;
+
+
+void setup ()
+{
+    if (digitalRead(PinSw) == SW_ON)
+    {
+        ShiftReg = ALL_ZEROS;
+        LookFor  = ALL_ONES;
+    }
+    else
+    {
+        ShiftReg = ALL_ONES;
+        LookFor  = ALL_ZEROS;
+    }
+}
+
+
+void loop ()
+{
+    uint32_t timeNow = millis();
+
+    if ( (timeNow - TimeThen) >= CLK_TICK )
+    {
+        // Do switch-related stuff
+        ShiftReg <<= 1;
+        ShiftReg  |= digitalRead(PinSw);        
+        ShiftReg  &= SR_MASK;
+
+        if (ShiftReg = LookFor)
+        {
+            // Really do switch-related stuff
+            if (LookFor == ALL_ZEROS)
+            {
+                // Do turn on stuff
+                // ShiftReg = ALL_ZEROS; // Already there
+                LookFor = ALL_ONES;
+            }
+            else
+            {
+                // Do turn off stuff (if any)
+                // ShiftReg = ALL_ONES; // Already there      
+                LookFor = ALL_ZEROS;
+            } 
+        }
+        
+        // Do non-switch-related stuff
+        
+        TimeThen = timeNow;
+    }
+}
+
+
+/*
+ * Copyright (c) 2022 Clive "Max" Maxfield
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and any associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHOR(S) OR COPYRIGHT HOLDER(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */

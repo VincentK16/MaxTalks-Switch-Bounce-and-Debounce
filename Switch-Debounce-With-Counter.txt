@@ -1,0 +1,98 @@
+/*
+ * Board:   Arduion Uno
+ * Target:  Demonstration of Switch Debounce
+ * Author:  Clive "Max" Maxfield (max@clivemaxfield.com) 
+ * License: The MIT License (See full license at the bottom of this file)
+ *
+ *          V01 First incarnation using counter
+ */
+
+#define CLK_TICK   1 
+#define MAX_COUNT 20
+
+#define SW_ON      0 // For active-low switch
+#define SW_OFF     1 //
+
+int      Counter  = 0;
+uint32_t TimeThen = millis();
+
+const int PinSw = 6;
+
+int LookFor;
+
+
+void setup ()
+{
+    if (digitalRead(PinSw) == SW_ON)
+    {
+        LookFor = SW_OFF;
+    }
+    else
+    {
+        LookFor = SW_ON;
+    }
+}
+
+
+void loop ()
+{
+    uint32_t timeNow = millis();
+
+    if ( (timeNow - TimeThen) >= CLK_TICK )
+    {
+        // Do switch-related stuff
+        if (digitalRead(PinSw) == LookFor)
+        {
+            Counter += 1;
+        }
+        else
+        {
+            Counter  = 0;
+        }
+
+        if (Counter >= MAX_COUNT)
+        {
+            // Really do switch-related stuff
+            if (LookFor == SW_ON)
+            {
+                // Do turn on stuff
+                LookFor = SW_OFF;
+            }
+            else
+            {
+                // Do turn off stuff (if any)
+                LookFor = SW_ON;
+            }
+            Counter = 0;
+        }
+        
+        // Do non-switch-related stuff
+        
+        TimeThen = timeNow;
+    }
+}
+
+
+
+
+/*
+ * Copyright (c) 2022 Clive "Max" Maxfield
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and any associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHOR(S) OR COPYRIGHT HOLDER(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
